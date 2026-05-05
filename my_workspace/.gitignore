@@ -1,5 +1,5 @@
-# ─── Secrets & Environment ───
-.env
+# ─── Secrets & Environment (included for easy dev setup) ───
+# .env
 *.env.local
 
 # ─── Persistent Data (bind mounts — ห้าม commit!) ───
