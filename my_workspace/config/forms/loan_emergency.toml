@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────
+#  CoopForm — กู้ฉุกเฉิน (Emergency Loan) Form Schema
+#  Sprint 17: Form Engine Pilot — TOML-driven config
+# ─────────────────────────────────────────────────────────
+
+[meta]
+form_id      = "loan_emergency"
+form_type    = "emergency"
+form_version = "1.0"
+pdf_template = "loan_emergency_v1.pdf"
+app_prefix   = "EMG"
+
+# ── Steps (Frontend rendering) ────────────────────────────
+[[steps]]
+id        = "personal_info"
+label     = "ข้อมูลผู้กู้"
+component = "Step1PersonalInfo"
+store_key = "step1"
+roles     = ["borrower", "staff"]
+
+[[steps]]
+id        = "emergency_details"
+label     = "รายละเอียดกู้ฉุกเฉิน"
+component = "StepEmergencyDetails"
+store_key = "stepEmergency"
+roles     = ["borrower", "staff"]
+
+[[steps]]
+id        = "attachments"
+label     = "เอกสารประกอบ"
+component = "StepAttachments"
+store_key = ""
+roles     = ["borrower", "staff"]
+
+[[steps]]
+id        = "signatures"
+label     = "ลงนาม"
+component = "Step4SignatureHub"
+store_key = "step4"
+roles     = ["borrower", "staff"]
+
+# ── PDF Field Mappings ────────────────────────────────────
+# type = "direct"    → source path เข้าถึง form_data โดยตรง (step.field.subfield)
+# type = "computed"  → fn เรียก built-in transform function ใน FormEngine
+# type = "concat"    → ต่อ string จากหลาย sources (คั่นด้วย separator)
+# type = "signature" → source = path ถึง base64, condition = path ที่ต้อง truthy
+
+[[pdf_fields]]
+pdf_key = "txt_date"
+type    = "computed"
+fn      = "thai_date_now"
+
+[[pdf_fields]]
+pdf_key   = "txt_name"
+type      = "concat"
+sources   = ["step1.title", "step1.first_name", "step1.last_name"]
+separator = ""
+
+[[pdf_fields]]
+pdf_key   = "txt_amount"
+type      = "direct"
+source    = "step2.loan_amount"
+transform = "format_number"
+
+[[pdf_fields]]
+pdf_key   = "txt_amount_text"
+type      = "direct"
+source    = "step2.loan_amount"
+transform = "baht_to_text"
+
+[[pdf_fields]]
+pdf_key = "txt_reason"
+type    = "direct"
+source  = "step2.loan_purpose"
+
+[[pdf_fields]]
+pdf_key   = "sign_borrower"
+type      = "signature"
+source    = "step4.borrower_sig.signature_base64"
+condition = "step4.borrower_sig.signed"

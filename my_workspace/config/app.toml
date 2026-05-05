@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────────
+#  CoopForm System — Main Application Config
+#  แก้ไขไฟล์นี้โดยตรงจาก Host ได้เลย โดยไม่ต้อง rebuild container
+# ─────────────────────────────────────────────────────────
+
+[app]
+name    = "CoopForm System"
+version = "1.2.0"
+debug   = false          # true สำหรับ dev เท่านั้น
+
+[server]
+host    = "0.0.0.0"
+port    = 8000
+workers = 2              # เพิ่มเป็น 4 หากโหลดสูง
+
+[database]
+# DATABASE_URL อ่านจาก .env เพื่อซ่อน password
+pool_size    = 5
+max_overflow = 10
+echo_sql     = false     # true เพื่อ debug SQL queries ใน dev
+
+[pdf]
+templates_dir  = "/app/data/pdf_templates"
+generated_dir  = "/app/data/pdf_generated"
+max_size_mb    = 10
+autoclean_days = 365     # ลบ PDF ที่เก่ากว่า 1 ปี อัตโนมัติ
+
+[storage]
+attachments_dir = "/app/data/attachments"
+max_size_mb     = 10
+allowed_mimes   = ["application/pdf"]
+
+[validation]
+enabled           = true   # Master Switch (ถ้าเป็น false จะปิดการตรวจทั้งหมด)
+check_file_size   = true
+check_file_type   = true
+check_app_status  = true
+
+[auth]
+access_token_expire_minutes = 15
+refresh_token_expire_days   = 7
+algorithm                   = "HS256"
+# SECRET_KEY อ่านจาก .env

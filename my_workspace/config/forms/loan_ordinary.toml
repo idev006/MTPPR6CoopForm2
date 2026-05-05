@@ -1,0 +1,37 @@
+# ─────────────────────────────────────────────────────────
+#  CoopForm — กู้สามัญ (Ordinary Loan) Form Schema
+#  แม็ปข้อมูลจาก form_data → PDF field names
+# ─────────────────────────────────────────────────────────
+
+[meta]
+form_type    = "ordinary"
+form_version = "1.0"
+pdf_template = "loan_ordinary_v1.pdf"
+app_prefix   = "ORD"
+steps        = 5
+
+[steps]
+[steps.step1]
+title = "ข้อมูลส่วนตัว"
+fields = ["write_at", "write_date", "fullname", "position", "department",
+          "member_id", "national_id", "salary_type", "salary_amount",
+          "addr", "addr2", "phone"]
+
+[steps.step2]
+title = "รายละเอียดการกู้"
+fields = ["loan_amount", "loan_amount_text", "installments",
+          "interest_rate", "purpose", "recv_method",
+          "bank_name", "bank_branch", "account_no", "account_name"]
+
+[steps.step3]
+title = "ผู้ค้ำประกัน"
+fields = ["guarantors"]
+max_guarantors = 3
+
+[steps.step4]
+title = "ลายมือชื่อ"
+fields = ["borrower_sig", "guarantor_sigs"]
+
+[steps.step5]
+title = "ตรวจสอบและยืนยัน"
+fields = []   # review only, no input

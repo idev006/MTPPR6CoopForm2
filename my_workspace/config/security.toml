@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────
+#  CoopForm — Security Config
+# ─────────────────────────────────────────────────────────
+
+[jwt]
+algorithm                   = "HS256"
+access_token_expire_minutes = 15
+refresh_token_expire_days   = 7
+# SECRET_KEY และ REFRESH_TOKEN_SECRET อ่านจาก .env
+
+[cors]
+# เพิ่ม origins จริงเมื่อ deploy
+allow_origins     = ["http://localhost:3000", "http://localhost:5173"]
+allow_credentials = true
+allow_methods     = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+allow_headers     = ["*"]
+
+[rate_limit]
+# requests ต่อ minute ต่อ IP
+default     = 60
+auth_login  = 10   # ป้องกัน brute-force
+pdf_download = 20

@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config:/etc/coopform/config:ro
+      - ./data/logs/nginx:/var/log/nginx
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - coopform-net
+    restart: always
+
+  api:
+    build: ./backend
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - ENVIRONMENT=production
+    volumes:
+      - ./config:/app/config:ro
+      - ./data/pdf_templates:/app/data/pdf_templates:ro
+      - ./data/pdf_generated:/app/data/pdf_generated
+      - ./data/attachments:/app/data/attachments
+      - ./data/logs/api:/app/data/logs
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2 --no-access-log
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - coopform-net
+    restart: always
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - coopform-net
+    restart: always
+
+volumes:
+  postgres_data:
+
+networks:
+  coopform-net:
+    driver: bridge

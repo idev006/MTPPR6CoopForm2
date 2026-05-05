@@ -1,0 +1,35 @@
+{
+  "name": "coopform-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@vee-validate/zod": "^4.13.0",
+    "axios": "^1.7.0",
+    "pinia": "^2.1.7",
+    "signature_pad": "^4.2.0",
+    "vee-validate": "^4.13.0",
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.4",
+    "@vitejs/plugin-vue": "^5.1.0",
+    "@vue/test-utils": "^2.4.0",
+    "autoprefixer": "^10.4.0",
+    "daisyui": "^5.5.19",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.0",
+    "vue-tsc": "^2.1.0"
+  }
+}

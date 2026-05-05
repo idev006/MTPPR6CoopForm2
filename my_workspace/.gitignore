@@ -1,0 +1,51 @@
+# ─── Secrets & Environment ───
+.env
+*.env.local
+
+# ─── Persistent Data (bind mounts — ห้าม commit!) ───
+data/postgres/
+data/pdf_generated/
+data/logs/
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ─── Virtual Environments ───
+MTPPR6CoopForm2Engine/
+venv/
+.venv/
+# root-level venv (F:/programming/python/MTPPR6CoopForm2/Scripts|Lib|Include)
+/Scripts/
+/Lib/
+/Include/
+pyvenv.cfg
+
+# ─── Node / Frontend ───
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.local
+
+# ─── IDE ───
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Docker ───
+*.tar

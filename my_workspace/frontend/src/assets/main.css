@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: all;
+}
+
+@theme {
+  --font-sans: 'Bai Jamjuree', sans-serif;
+}
+
+@source "../index.html";
+@source "./**/*.{vue,js,ts,jsx,tsx}";
