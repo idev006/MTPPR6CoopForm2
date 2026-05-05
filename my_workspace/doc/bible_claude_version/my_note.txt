@@ -1,0 +1,100 @@
+# Developer & Project Management Manifesto
+# CoopForm Project — MTPPR6CoopForm2
+
+แนวทางการทำงานเพื่อให้เกิดประสิทธิภาพสูงสุดและการทำงานร่วมกันที่ยั่งยืน
+ปรับปรุงล่าสุด: 2026-04-26 (หลังจบ Phase 1 Infrastructure)
+
+---
+
+## 1. ยุทธศาสตร์และการวางแผน (Strategic Planning & Design)
+
+- **Brainstorming First:** ให้ความสำคัญสูงสุดกับการระดมสมองเพื่อเฟ้นหา Solution ที่ดีที่สุดก่อนเริ่มลงมือ
+- **Deep User Requirements:** การเก็บความต้องการของผู้ใช้ต้องละเอียด รอบคอบ และครอบคลุม เพราะเป็นรากฐานสำคัญของความสำเร็จ
+- **Project Bible = Master Blueprint:** คัมภีร์โครงการคือ SSOT ที่ทุกคนในทีมต้องใช้เป็นบรรทัดฐานเดียวกัน อ่านก่อนทำงานทุกครั้ง
+- **Understand the "Why" ก่อนเสมอ:** เช่น ระบบนี้สร้างขึ้นเพราะ "ชื่อผู้กู้ปรากฏซ้ำ 20+ จุดในฟอร์ม" — เข้าใจ WHY ทำให้ตัดสินใจทางเทคนิคได้ถูกต้อง
+
+---
+
+## 2. สถาปัตยกรรมและการพัฒนา (Architecture & Development)
+
+- **System Analysis & Design:** วิเคราะห์และออกแบบระบบอย่างเป็นขั้นตอน ลดความซับซ้อน ป้องกันข้อผิดพลาดในอนาคต
+- **Loose Coupling & Modularity:** เชื่อมต่อแบบหลวมๆ แบ่งระบบเป็นส่วนย่อย เพื่อดูแลรักษาและ scale ได้ง่าย
+- **Code follows Blueprint:** คุณภาพของงานขึ้นอยู่กับความชัดเจนของแบบแปลน — เขียน code คือแปลง Blueprint ให้เป็นจริง
+- **Portability by Design:** ออกแบบให้ย้าย DB / environment ได้โดยแก้ config เพียงจุดเดียว ไม่ควรมี dialect-specific code ในชั้น business logic
+- **Proven Stack Only:** ใช้เฉพาะ library ที่พิสูจน์แล้วว่าทำงานได้กับ requirement จริง เช่น pikepdf+reportlab (ไม่ใช่ pypdf) — พิสูจน์ใน Sprint 1 ก่อนสร้างระบบ
+
+---
+
+## 3. กระบวนการทำงานและการจัดการโครงการ (Workflow & Project Management)
+
+- **Iterative Planning:** กำหนดเป้าหมายหลัก → Task Breakdown → Planning → Milestone ที่ชัดเจน
+- **Agile / Sprint Based:** ดำเนินงานผ่าน Sprint มีเป้าหมายและ Definition of Done ชัดเจนทุก Sprint
+- **Sprint Checkpoints:** จบแต่ละ Phase ต้องมี Checkpoint ตรวจสอบก่อนเริ่มขั้นตอนถัดไป — ห้ามข้ามไปโดยไม่ผ่าน DoD
+- **Continuous Documentation:** อัปเดต Project Bible และ memory อยู่เสมอ ข้อมูลต้องเป็นปัจจุบัน
+- **Fail Fast, Fix Early:** ถ้าทดสอบ spike/proof-of-concept แล้วไม่ผ่าน ให้แก้ก่อนสร้าง — ไม่ใช่แก้ทีหลัง
+
+---
+
+## 4. คุณภาพและการสื่อสาร (Quality & Communication)
+
+- **Single Source of Truth (SSOT):** ระบบมีแหล่งข้อมูลความจริงเพียงหนึ่งเดียว ป้องกันความสับสนและข้อมูลขัดแย้ง
+- **Shared Vision:** ทีมต้องเห็นภาพรวมเดียวกัน — ผู้ใช้กรอกข้อมูลครั้งเดียว ระบบจัดการส่วนที่เหลือเอง
+- **System Communication Protocols:** ให้ความสำคัญกับมาตรฐาน API/interface ระหว่าง component เพื่อให้ทำงานไร้รอยต่อ
+- **Proactive Reporting:** รายงานความคืบหน้าสม่ำเสมอ พร้อมเสนอแนะเชิงรุก ช่วยการตัดสินใจเชิงบริหาร
+
+---
+
+## 5. บทเรียนจากการพัฒนาจริง (Lessons Learned — อัปเดตต่อเนื่อง)
+
+บันทึกปัญหาและวิธีแก้ที่พิสูจน์แล้วจากโปรเจกต์นี้
+
+### 5.1 Database & ORM
+- ใช้ SQLAlchemy generic types เสมอ (`sa.Uuid`, `sa.JSON`) ห้ามใช้ `postgresql.UUID` / `postgresql.JSONB` ใน models/migrations
+  → เหตุผล: ต้องการ dev บน SQLite ก่อน deploy บน PostgreSQL โดยแก้แค่ `.env`
+- SQLite ไม่รองรับ `ALTER TABLE ADD CONSTRAINT` → ใช้ `create_index(..., unique=True)` แทน `create_unique_constraint`
+- SQLite ต้องส่ง `connect_args={"check_same_thread": False}` เมื่อใช้ async engine
+- Database pool settings (`pool_size`, `max_overflow`) ใช้ได้เฉพาะ PostgreSQL — ต้อง detect จาก URL ก่อน
+
+### 5.2 Windows Environment
+- ไฟล์ `.ini` / `.cfg` ที่ Alembic อ่านด้วย locale encoding → ห้ามใส่ภาษาไทยหรือ Unicode พิเศษ (เช่น `─`) ใน `alembic.ini`
+  → แก้โดย: ใช้ `PYTHONUTF8=1` เมื่อรัน alembic และเขียน comment เป็น ASCII ใน .ini เท่านั้น
+- Python files (`.py`) อ่านด้วย UTF-8 เสมอ → ใส่ภาษาไทยใน `.py` ได้ปกติ
+
+### 5.3 PDF Engine
+- PDF template นี้ต้องใช้ pikepdf + reportlab เท่านั้น (pypdf.update_page_form_field_values ใช้ไม่ได้)
+  → พิสูจน์ใน Sprint 1 ก่อนสร้างระบบ
+- Font THSarabunNew ต้อง register กับ reportlab ก่อนใช้งานทุกครั้ง
+- PDF template อยู่ที่: `data/pdf_templates/loan_ordinary_v1.pdf`
+
+### 5.4 Development Workflow
+- รัน dev server:
+  ```
+  cd my_workspace/backend
+  PYTHONUTF8=1 DATABASE_URL="sqlite+aiosqlite:///./coopform_dev.db" \
+  SECRET_KEY="..." REFRESH_TOKEN_SECRET="..." \
+  CONFIG_DIR="[path]/my_workspace/config" \
+  uvicorn app.main:app --reload
+  ```
+- สร้าง/reset DB:
+  ```
+  PYTHONUTF8=1 DATABASE_URL="sqlite+aiosqlite:///./coopform_dev.db" ... alembic upgrade head
+  ```
+- Switch เป็น PostgreSQL: เปลี่ยน `DATABASE_URL` ใน `.env` เพียงบรรทัดเดียว — ไม่ต้องแตะ code
+
+---
+
+## 6. สิ่งที่ห้ามทำ (Anti-Patterns)
+
+- **ห้ามเขียน raw SQL** ในชั้น service โดยไม่จำเป็น — ใช้ SQLAlchemy ORM เพื่อ portability
+- **ห้าม hardcode path หรือ config** ใน code — ทุกอย่างอ่านจาก TOML หรือ environment variable
+- **ห้ามข้าม Sprint Checkpoint** — แม้จะรีบ ต้องผ่าน Definition of Done ก่อนเสมอ
+- **ห้ามใช้ library ใหม่โดยไม่พิสูจน์ก่อน** — ทำ spike/proof-of-concept ก่อนทุกครั้ง
+- **ห้าม commit .env** — เด็ดขาด
+
+---
+
+*หลักการเหล่านี้มุ่งเน้น Reliability, Flexibility และ Scalability ระยะยาว*
+*อัปเดตเมื่อเรียนรู้สิ่งใหม่จากการพัฒนาจริง — ไม่ใช่เอกสารที่เขียนแล้วทิ้ง*
+
+*โปรเจครี้สร้างด้วย python virtual environment 3.12 ที่ F:\programming\python\MTPPR6CoopForm2\Scripts
+ก่อนใช้งาน หรือ ติดตั้ง libs ต่างๆ ต้อง avtivate virtual env ก่อนเสมอ  

@@ -46,6 +46,4 @@ desktop.ini
 *.tar
 
 # ─── โฟลเดอร์ชั่วคราว ───
-doc/
-scratch/
 tee_temp/
